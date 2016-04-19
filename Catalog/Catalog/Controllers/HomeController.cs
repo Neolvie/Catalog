@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Catalog.Shared.Model;
+using Catalog.ViewModel;
 
 namespace Catalog.Controllers
 {
@@ -36,7 +37,9 @@ namespace Catalog.Controllers
 
       ViewBag.Message = $"Сущность \"{category.Name}\" (id {category.Id}) создана успешно";
 
-      return View();
+      var model = new CategoriesViewModel();
+
+      return View(model);
     }
   }
 }

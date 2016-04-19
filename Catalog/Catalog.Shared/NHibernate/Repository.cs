@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using NHibernate.Linq;
 
-namespace Catalog.Shared.NHibernate
+namespace Catalog
 {
   public static class Repository
   {
     public static IQueryable<T> Get<T>() where T : Catalog.Shared.Model.Base.Entity
     {
-      return Environment.Session.Query<T>();
+      return Shared.NHibernate.Environment.Session.Query<T>();
     }
 
     public static void SaveAll<T>(this IEnumerable<T> objects) where T : Catalog.Shared.Model.Base.Entity
@@ -18,7 +18,7 @@ namespace Catalog.Shared.NHibernate
       if (!objectList.Any())
         return;
 
-      var session = Environment.Session;
+      var session = Shared.NHibernate.Environment.Session;
       using (var transact = session.BeginTransaction())
       {
         try

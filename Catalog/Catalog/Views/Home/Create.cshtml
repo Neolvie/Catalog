@@ -1,4 +1,4 @@
-﻿@model Catalog.Shared.Model.Category
+﻿@model Catalog.ViewModel.CategoriesViewModel
 
 @{
     ViewBag.Title = "Create";
@@ -8,6 +8,26 @@
 <h2>Create</h2>
 
 <h3>@ViewBag.Message</h3>
+
+<table>
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Guid</th>
+        <th>Тип</th>
+        <th>Имя</th>
+    </tr>
+    </thead>
+    @foreach (var category in Model.Categories)
+    {
+        <tr>
+            <td style="padding: 5px 2px 5px 2px">@category.Id</td>
+            <td style="padding: 5px 2px 5px 2px">@category.TypeGuid</td>
+            <td style="padding: 5px 2px 5px 2px">@category.TypeName</td>
+            <td style="padding: 5px 2px 5px 2px">@category.Name</td>
+        </tr>
+    }
+</table>
 
 <div>
     @Html.ActionLink("Back to List", "Index")
