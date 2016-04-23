@@ -75,9 +75,9 @@
 
         var row =
             '<tr' + (asg.HasOverdue ? ' style=\"background-color:#FFE9DC\"' : '\"\"') + '>' +
-                '<td><a href=\"/Asg/' + asg.Id + '\">' + asg.Id + '</a></td>' +
+                '<td><a href=\"/Asg/Index?id=' + asg.Id + '\">' + asg.Id + '</a></td>' +
                 '<td>' + asg.Name + '</td>' +
-                '<td><a href=\"/Performer/' + asg.Performer.Id + '\">' + asg.Performer.Name + '</a></td>' +
+                '<td><a href=\"/Performer/Index?id=' + asg.Performer.Id + '\">' + asg.Performer.Name + '</a></td>' +
                 '<td>' + (!asg.Deadline ? '-' : date.toLocaleDateString('ru-RU', options)) + '</td>' +
                 '<td>' + asg.Status + '</td>' +
                 '<td>' + (asg.HasOverdue ? asg.Overdue : '-') + '</td>' +
