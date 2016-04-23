@@ -26,5 +26,12 @@ namespace Catalog.Controllers
 
       return RedirectToAction("Index", "AsgList");
     }
+
+    public ActionResult GetRandomAsg()
+    {
+      var asg = Model.Repository.Model.Assignments[new Random().Next(Model.Repository.Model.Assignments.Count)];
+
+      return Json(asg, JsonRequestBehavior.AllowGet);
+    }
   }
 }

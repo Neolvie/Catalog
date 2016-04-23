@@ -10,6 +10,9 @@
     <span class="h2">Список заданий</span>
     <span> (@Html.ActionLink("перегенерировать", "RegenerateList", "AsgList"))</span>
 </div>
+
+<button id="button" onclick="AddRandomAsg()" class="btn btn-success">Добавить случайное задание</button>
+<div id="newAsg"></div>
 <div class="table">
     <table class="table">
         <thead>
@@ -22,7 +25,7 @@
             <th>Просрочка</th>
         </tr>
         </thead>
-
+        <tbody id="AsgListTable">
         @foreach (var asg in (List<Assignment>) ViewBag.AsgList)
         {
             <tr @(asg.HasOverdue ? "style=background-color:#FFE9DC" : "")>
@@ -32,11 +35,11 @@
                 <td>@(asg.Deadline?.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture) ?? "-")</td>
                 <td>@asg.Status</td>
                 <td>@(asg.HasOverdue ? asg.Overdue.ToString() : "-")</td>
-                <td style=""></td>
             </tr>
         }
+        </tbody>
     </table>
-    @{ var totalPages = (int)Math.Ceiling(Model.Assignments.Count / (double)10); }
+    @{ var totalPages = (int) Math.Ceiling(Model.Assignments.Count/(double) 10); }
     @for (var i = 1; i <= totalPages; ++i)
     {
         if (i == ViewBag.Page)
@@ -45,8 +48,41 @@
         }
         else
         {
-            <span style="margin: 5px 0 5px 0">@Html.ActionLink(i.ToString(), "Index", "AsgList", new { page = i }, null)</span>
+            <span style="margin: 5px 0 5px 0">@Html.ActionLink(i.ToString(), "Index", "AsgList", new {page = i}, null)</span>
         }
     }
 
 </div>
+<script>
+    function AddRandomAsg() {
+        $.get('@Url.Action("GetRandomAsg", "AsgList")', function (asg) {
+            $("#newAsg").text = asg;
+            if (asg) {
+                AddRow(asg);
+            }
+        });
+    }
+
+    function AddRow(asg) {
+
+        var date = new Date(parseInt(asg.Deadline.substr(6)));
+
+        var options = {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        };
+
+        var row =
+            '<tr' + (asg.HasOverdue ? ' style=\"background-color:#FFE9DC\"' : '\"\"') + '>' +
+                '<td><a href=\"/Asg/' + asg.Id + '\">' + asg.Id + '</a></td>' +
+                '<td>' + asg.Name + '</td>' +
+                '<td><a href=\"/Performer/' + asg.Performer.Id + '\">' + asg.Performer.Name + '</a></td>' +
+                '<td>' + (!asg.Deadline ? '-' : date.toLocaleDateString('ru-RU', options)) + '</td>' +
+                '<td>' + asg.Status + '</td>' +
+                '<td>' + (asg.HasOverdue ? asg.Overdue : '-') + '</td>' +
+                '</tr>';
+        $("#AsgListTable").prepend(row);
+        $("#AsgListTable tr:last").remove();
+    }
+</script>
