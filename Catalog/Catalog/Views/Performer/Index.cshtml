@@ -1,0 +1,41 @@
+﻿@model Catalog.Model.Performer
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (Model != null)
+{
+
+    <h2>Сотрудник @Model.Name</h2>
+    <div class="table table-responsive">
+        <table class="table table-condensed">
+            <tr>
+                <td>Ид</td>
+                <td>@Model.Id</td>
+            </tr>
+            <tr>
+                <td>ФИО</td>
+                <td>@Model.Name</td>
+            </tr>
+            <tr>
+                <td>Должность</td>
+                <td>@Model.JobTitle</td>
+            </tr>
+            <tr>
+                <td>Статус</td>
+                <td>@( Model.Active ? "Действующая" : "Закрытая")</td>
+            </tr>
+            <tr>
+                <td>Подразделение</td>
+                <td>@Model.DepartmentName</td>
+            </tr>
+        </table>
+    </div>
+}
+else
+{
+    <h2>Запись не найдена</h2>
+}
+
+<a href="javascript:window.history.back()">Назад</a>

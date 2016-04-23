@@ -121,8 +121,10 @@
     <Compile Include="App_Start\DatabaseConnect.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AsgController.cs" />
     <Compile Include="Controllers\AsgListController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PerformerController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -174,6 +176,8 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Create.cshtml" />
     <Content Include="Views\AsgList\Index.cshtml" />
+    <Content Include="Views\Performer\Index.cshtml" />
+    <Content Include="Views\Asg\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

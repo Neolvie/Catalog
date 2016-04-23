@@ -1,0 +1,53 @@
+﻿@model Catalog.Model.Assignment
+@{
+  ViewBag.Title = "Index";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (Model != null)
+{
+
+<h2>@Model.Name</h2>
+<div class="table table-responsive">
+    <table class="table table-condensed">
+        <tr>
+            <td>Ид</td>
+            <td>@Model.Id</td>
+        </tr>
+        <tr>
+            <td>Тема</td>
+            <td>@Model.Name</td>
+        </tr>
+        <tr>
+            <td>Исполнитель</td>
+            <td>@Html.ActionLink(@Model.Performer.Name, "Index", "Performer", new { id = Model.Performer.Id }, null)</td>
+        </tr>
+        <tr>
+            <td>Статус</td>
+            <td>@Model.Status</td>
+        </tr>
+        <tr>
+            <td>Создано</td>
+            <td>@Model.Created</td>
+        </tr>
+        <tr>
+            <td>Срок</td>
+            <td>@Model.Deadline</td>
+        </tr>
+        <tr>
+            <td>Выполнено</td>
+            <td>@(Model.InWork ? "-" : Model.Modified.ToString())</td>
+        </tr>
+        <tr>
+            <td>Просрочка</td>
+            <td @(Model.HasOverdue ? "style=color:#ff0000" : "")>@(Model.HasOverdue ? Model.Overdue.ToString() : "-")</td>
+        </tr>
+    </table>
+</div>
+}
+else
+{
+<h2>Запись не найдена</h2>
+}
+
+<a href="javascript:window.history.back()">Назад</a>

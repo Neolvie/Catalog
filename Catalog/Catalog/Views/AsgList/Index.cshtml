@@ -4,10 +4,12 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Список заданий</h2>
-
-<div class="table-responsive">
-    <table class="table table-hover">
+<div>
+    <div class="h2">Список заданий</div>
+    <div> (@Html.ActionLink("перегенерировать", "RegenerateList", "AsgList"))</div>
+</div>
+<div class="table">
+    <table class="table">
         <thead>
             <tr>
                 <th>Ид</th>
@@ -20,20 +22,14 @@
         </thead>
         @foreach (var asg in Model.Assignments)
         {
-        <tr class="@(asg.HasOverdue ? "table-warning" : "")">
-            <td><a href="#">@asg.Id</a></td>
+        <tr @(asg.HasOverdue ? "style=background-color:#FFE9DC" : "")>
+            <td>@Html.ActionLink(asg.Id.ToString(), "Index", "Asg", new { id = asg.Id }, null)</td>
             <td>@asg.Name</td>
-            <td><a href="#">@asg.Performer.Name</a></td>
+            <td>@Html.ActionLink(asg.Performer.Name, "Index", "Performer", new { id = asg.Performer.Id }, null)</td>
             <td>@asg.Deadline</td>
             <td>@asg.Status</td>
-            @if (asg.HasOverdue)
-            {
-                <td>@asg.Overdue</td>
-            }
-            else
-            {
-                <td>-</td>
-            }
+            <td>@(asg.HasOverdue ? asg.Overdue.ToString() : "-")</td>
+            <td style=""></td>
         </tr>
         }
     </table>

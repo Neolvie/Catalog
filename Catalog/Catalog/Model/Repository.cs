@@ -46,10 +46,10 @@ namespace Catalog.Model
       var asg = new Assignment();
 
       asg.Created = DateTime.Now.AddDays(-new Random().Next(30));
-      asg.Deadline = asg.Created.AddDays(new Random().Next(35));
+      asg.Deadline = asg.Created.AddDays(new Random().Next(25));
       asg.Id = new Random().Next(100000);
-      asg.InWork = Convert.ToBoolean(new Random().Next(1));
-      asg.Modified = asg.Created.AddDays(new Random().Next(29));
+      asg.InWork = Convert.ToBoolean(new Random().Next(0, 2));
+      asg.Modified = asg.Created.AddDays(new Random().Next(20));
       asg.PerformerId = performers[new Random().Next(performers.Count)].Id;
       asg.TaskId = new Random().Next(5000);
       asg.TaskTypeGuid = TaskTypeGuids[new Random().Next(TaskTypeGuids.Count)];
@@ -85,6 +85,11 @@ namespace Catalog.Model
       TaskTypes.Add("4ef03457-8b42-4239-a3c5-d4d05e61f0b6", "Задача на рассмотрение документа");
 
       TaskTypeGuids = TaskTypes.Select(x => x.Key).ToList();
+    }
+
+    public static void ResetModel()
+    {
+      _model = null;
     }
   }
 }
