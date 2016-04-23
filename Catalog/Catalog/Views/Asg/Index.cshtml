@@ -1,6 +1,7 @@
-﻿@model Catalog.Model.Assignment
+﻿@using System.Globalization
+@model Catalog.Model.Assignment
 @{
-  ViewBag.Title = "Index";
+  ViewBag.Title = $"Задание \"{Model.Name}\"";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -32,11 +33,11 @@
         </tr>
         <tr>
             <td>Срок</td>
-            <td>@Model.Deadline</td>
+            <td>@(Model.Deadline?.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture) ?? "-")</td>
         </tr>
         <tr>
             <td>Выполнено</td>
-            <td>@(Model.InWork ? "-" : Model.Modified.ToString())</td>
+            <td>@(Model.InWork ? "-" : Model.Modified.Value.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture))</td>
         </tr>
         <tr>
             <td>Просрочка</td>

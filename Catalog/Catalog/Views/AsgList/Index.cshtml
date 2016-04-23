@@ -1,36 +1,52 @@
-﻿@model Catalog.Model.Model
+﻿@using System.Globalization
+@using Catalog.Model
+@model Model
 @{
-  ViewBag.Title = "Index";
+  ViewBag.Title = "Список заданий";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div>
-    <div class="h2">Список заданий</div>
-    <div> (@Html.ActionLink("перегенерировать", "RegenerateList", "AsgList"))</div>
+<div style="margin-top: 20px">
+    <span class="h2">Список заданий</span>
+    <span> (@Html.ActionLink("перегенерировать", "RegenerateList", "AsgList"))</span>
 </div>
 <div class="table">
     <table class="table">
         <thead>
-            <tr>
-                <th>Ид</th>
-                <th>Тема</th>
-                <th>Исполнитель</th>
-                <th>Срок</th>
-                <th>Статус</th>
-                <th>Просрочка</th>
-            </tr>
-        </thead>
-        @foreach (var asg in Model.Assignments)
-        {
-        <tr @(asg.HasOverdue ? "style=background-color:#FFE9DC" : "")>
-            <td>@Html.ActionLink(asg.Id.ToString(), "Index", "Asg", new { id = asg.Id }, null)</td>
-            <td>@asg.Name</td>
-            <td>@Html.ActionLink(asg.Performer.Name, "Index", "Performer", new { id = asg.Performer.Id }, null)</td>
-            <td>@asg.Deadline</td>
-            <td>@asg.Status</td>
-            <td>@(asg.HasOverdue ? asg.Overdue.ToString() : "-")</td>
-            <td style=""></td>
+        <tr>
+            <th>Ид</th>
+            <th>Тема</th>
+            <th>Исполнитель</th>
+            <th>Срок</th>
+            <th>Статус</th>
+            <th>Просрочка</th>
         </tr>
+        </thead>
+
+        @foreach (var asg in (List<Assignment>) ViewBag.AsgList)
+        {
+            <tr @(asg.HasOverdue ? "style=background-color:#FFE9DC" : "")>
+                <td>@Html.ActionLink(asg.Id.ToString(), "Index", "Asg", new {id = asg.Id}, null)</td>
+                <td>@asg.Name</td>
+                <td>@Html.ActionLink(asg.Performer.Name, "Index", "Performer", new {id = asg.Performer.Id}, null)</td>
+                <td>@(asg.Deadline?.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture) ?? "-")</td>
+                <td>@asg.Status</td>
+                <td>@(asg.HasOverdue ? asg.Overdue.ToString() : "-")</td>
+                <td style=""></td>
+            </tr>
         }
     </table>
+    @{ var totalPages = (int)Math.Ceiling(Model.Assignments.Count / (double)10); }
+    @for (var i = 1; i <= totalPages; ++i)
+    {
+        if (i == ViewBag.Page)
+        {
+            <span style="margin: 5px 0 5px 0">@i</span>
+        }
+        else
+        {
+            <span style="margin: 5px 0 5px 0">@Html.ActionLink(i.ToString(), "Index", "AsgList", new { page = i }, null)</span>
+        }
+    }
+
 </div>
