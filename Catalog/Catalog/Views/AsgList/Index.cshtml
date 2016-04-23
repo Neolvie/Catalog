@@ -1,0 +1,40 @@
+﻿@model Catalog.Model.Model
+@{
+  ViewBag.Title = "Index";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Список заданий</h2>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Ид</th>
+                <th>Тема</th>
+                <th>Исполнитель</th>
+                <th>Срок</th>
+                <th>Статус</th>
+                <th>Просрочка</th>
+            </tr>
+        </thead>
+        @foreach (var asg in Model.Assignments)
+        {
+        <tr class="@(asg.HasOverdue ? "table-warning" : "")">
+            <td><a href="#">@asg.Id</a></td>
+            <td>@asg.Name</td>
+            <td><a href="#">@asg.Performer.Name</a></td>
+            <td>@asg.Deadline</td>
+            <td>@asg.Status</td>
+            @if (asg.HasOverdue)
+            {
+                <td>@asg.Overdue</td>
+            }
+            else
+            {
+                <td>-</td>
+            }
+        </tr>
+        }
+    </table>
+</div>
