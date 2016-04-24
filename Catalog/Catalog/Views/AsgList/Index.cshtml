@@ -16,7 +16,20 @@
     <span> (@Html.ActionLink("перегенерировать", "RegenerateList", "AsgList"))</span>
 </div>
 
-<button id="button" onclick="AddRandomAsg()" class="btn btn-success">Добавить случайное задание</button>
+<div class="row">
+    <div class="col-md-2">
+        <button id="button" onclick="AddRandomAsg()" class="btn btn-success">Добавить случайное задание</button>
+    </div>
+    <div class="col-md-offset-2 col-md-2">
+        <button class="btn btn-info" id="MiAButton">Мониторинг и анализ</button>
+    </div>
+</div>
+
+<script>
+    $('#MiAButton').click(function() {
+        location.href = '@Url.Action("Index", "MiA")';
+    });
+</script>
 
 <div class="row">
     <div class="col-md-8">

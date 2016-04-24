@@ -127,6 +127,7 @@
     <Compile Include="Controllers\AsgController.cs" />
     <Compile Include="Controllers\AsgListController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MiAController.cs" />
     <Compile Include="Controllers\PerformerController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -217,6 +218,7 @@
     <Content Include="Views\AsgList\Index.cshtml" />
     <Content Include="Views\Performer\Index.cshtml" />
     <Content Include="Views\Asg\Index.cshtml" />
+    <Content Include="Views\MiA\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
