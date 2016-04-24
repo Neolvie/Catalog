@@ -24,7 +24,7 @@ namespace Catalog.Controllers
 
     private Highcharts GetOverduedTasksChart(IEnumerable<Assignment> assignments)
     {
-      var chart = new Highcharts("OverdueChart")               
+      var chart = new Highcharts("OverdueChart")
                 .InitChart(new Chart { PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })
                 .SetExporting(new Exporting() { Enabled = false })
                 .SetTitle(new Title { Text = "Задания c нарушением срока", Align = HorizontalAligns.Left })
@@ -33,7 +33,7 @@ namespace Catalog.Controllers
                 .SetPlotOptions(new PlotOptions
                 {
                   Pie = new PlotOptionsPie
-                  {                    
+                  {
                     AllowPointSelect = true,
                     Cursor = Cursors.Pointer,
                     DataLabels = new PlotOptionsPieDataLabels { Enabled = false },
@@ -55,51 +55,45 @@ namespace Catalog.Controllers
       var discipline = 66;
 
       var chart = new Highcharts("PerformerDisciplineChart")
-                .InitChart(new Chart
-                {
-                  PlotShadow = false,
-                  PlotBackgroundColor = null,
-                  PlotBorderWidth = null,
-                  MarginTop = 0,
-                  Events = new ChartEvents() { Load = "SetCenterText" }
-                })
-                .SetExporting(new Exporting() { Enabled = false })
-                .SetTitle(new Title { Text = "Исполнительская дисциплина", Align = HorizontalAligns.Left })
-                .SetTooltip(new Tooltip { Enabled = false })
-                .SetPlotOptions(new PlotOptions
-                {
-                  Pie = new PlotOptionsPie
-                  {
-                    AllowPointSelect = false,
-                    InnerSize = new PercentageOrPixel(50, true),
-                    Size = new PercentageOrPixel(75, true),
-                    Cursor = Cursors.Pointer,
-                    DataLabels = new PlotOptionsPieDataLabels { Enabled = false },
-                    ShowInLegend = false
-                  }
-                })
-                .SetSeries(new Series
-                {
-                  Type = ChartTypes.Pie,
-                  Name = "Исполнительская дисциплина",
-                  Data = new Data(new[]
-                  {
-                    new Point() { Y = discipline },
-                    new Point() { Y = 100 - discipline }
-                  })
-                })
-                .AddJavascripFunction("SetCenterText", string.Format(@"
-                                                        var textX = this.plotLeft + (this.plotWidth  * 0.5);
-                                                        var textY = this.plotTop + (this.plotHeight * 0.5);
-
-                                                        var span = '<span id=""pieChartInfoText"" style=""position: relative; text-align: center;"">';
-                                                        span += '<span style=""font-size: 48px; font-family: Arial"">{0}%</span><br>';
-                                                        span += '</span>';
-
-                                                        $('#addText').append(span);
-                                                        span = $('#pieChartInfoText');
-                                                        span.css('left', textX + (span.width() * -0.5));
-                                                        span.css('top', textY + (span.height() * -0.5));", discipline));
+        .InitChart(new Chart
+        {
+          PlotShadow = false,
+          PlotBackgroundColor = null,
+          PlotBorderWidth = null,
+          MarginTop = 0
+        })
+        .SetExporting(new Exporting() {Enabled = false})
+        .SetTitle(new Title
+        {
+          Text = string.Format("{0}%", discipline),
+          Align = HorizontalAligns.Center,
+          VerticalAlign = VerticalAligns.Middle,
+          Y = 8,
+          Style = "fontSize: '36px', fontFamily: 'Arial'"
+        })
+        .SetTooltip(new Tooltip {Enabled = false})
+        .SetPlotOptions(new PlotOptions
+        {
+          Pie = new PlotOptionsPie
+          {
+            AllowPointSelect = false,
+            InnerSize = new PercentageOrPixel(50, true),
+            Size = new PercentageOrPixel(75, true),
+            Cursor = Cursors.Pointer,
+            DataLabels = new PlotOptionsPieDataLabels {Enabled = false},
+            ShowInLegend = false
+          }
+        })
+        .SetSeries(new Series
+        {
+          Type = ChartTypes.Pie,
+          Name = "Исполнительская дисциплина",
+          Data = new Data(new[]
+          {
+            new Point() {Y = discipline},
+            new Point() {Y = 100 - discipline}
+          })
+        });
 
       return chart;
     }
