@@ -31,6 +31,8 @@ namespace Catalog.Controllers
 
     public ActionResult Create()
     {
+      DatabaseConnect.Initialize();
+
       var category = new Category();
       category.Name = "Просто категория";
       category.Save();

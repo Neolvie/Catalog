@@ -1,8 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Catalog.Model;
+using DotNet.Highcharts;
+using DotNet.Highcharts.Enums;
+using DotNet.Highcharts.Helpers;
+using DotNet.Highcharts.Options;
+using Point = DotNet.Highcharts.Options.Point;
 
 namespace Catalog.Controllers
 {
@@ -17,7 +24,40 @@ namespace Catalog.Controllers
 
       ViewBag.AsgList = Model.Repository.Model.Assignments.Skip(skipPages).Take(10).ToList();
 
+      var chart = new Highcharts("chart")
+                .InitChart(new Chart { PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })
+                .SetTitle(new Title { Text = "Задания в разрезе типов задач", Align = HorizontalAligns.Left})
+                .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
+                .SetLegend( new Legend() { ItemStyle = "fontWeight: 'normal'"}) 
+                .SetPlotOptions(new PlotOptions
+                {
+                  Pie = new PlotOptionsPie
+                  {                    
+                    AllowPointSelect = true,
+                    Cursor = Cursors.Pointer,                    
+                    DataLabels = new PlotOptionsPieDataLabels { Enabled = false},
+                    ShowInLegend = true
+                  }
+                })
+                .SetSeries(new Series
+                {                 
+                  Type = ChartTypes.Pie,
+                  Name = "Типы задач",
+                  Data = new Data(GetSeries(ViewBag.AsgList))
+                });
+
+      ViewBag.Chart = chart;
+
       return View(Model.Repository.Model);
+    }
+
+    private static Point[] GetSeries(IEnumerable<Assignment> assignments)
+    {
+      var group = assignments.GroupBy(x => x.TaskTypeName)
+        .OrderByDescending(x => x.Count())
+        .Select(x => new Point { Name = x.Key, Y = x.Count() }).ToArray();
+
+      return group;
     }
 
     public ActionResult RegenerateList()
