@@ -25,9 +25,9 @@ namespace Catalog.Controllers
     private Highcharts GetOverduedTasksChart(IEnumerable<Assignment> assignments)
     {
       var chart = new Highcharts("OverdueChart")
-                .InitChart(new Chart { PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })
+                .InitChart(new Chart { PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null, MarginTop = 50})
                 .SetExporting(new Exporting() { Enabled = false })
-                .SetTitle(new Title { Text = "Задания c нарушением срока", Align = HorizontalAligns.Left })
+                .SetTitle(new Title { Text = "", Align = HorizontalAligns.Left })
                 .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
                 .SetLegend(new Legend { ItemStyle = "fontWeight: 'normal'" })
                 .SetPlotOptions(new PlotOptions

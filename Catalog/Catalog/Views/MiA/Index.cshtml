@@ -13,15 +13,29 @@
         <div class="col-md-8">
             <div class="row">
                 <div class="col-md-5">
-                    <div style="position: relative; left: 0; top: 0;">@ViewBag.DisciplineChart</div>
+                    <div class="row">
+                        <h3>Исполнительская дисциплина</h3>
+                    </div>
+                    <div class="row">
+                        <div style="position: relative; left: 0; top: 0;">@ViewBag.DisciplineChart</div>
+                    </div>
                 </div>
-                <div class="col-md-5">@ViewBag.OverdueTasks</div>
+                <div class="col-md-5">
+                    <div class="row">
+                        <h3>Задания c нарушением срока</h3>
+                    </div>
+                    <div class="row">@ViewBag.OverdueTasks</div>
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-8">Динамика активных заданий</div>
             </div>
         </div>
-        <div class="col-md-4">Сотрудники с высокой загрузкой</div>
+        <div class="col-md-4">
+            <div class="row">
+                <h3>Сотрудники с высокой загрузкой</h3>
+            </div>
+        </div>
     </div>
 </div>
 
