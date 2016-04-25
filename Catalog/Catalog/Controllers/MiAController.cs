@@ -18,6 +18,7 @@ namespace Catalog.Controllers
     {
       ViewBag.DisciplineChart = GetPerformerDisciplineChart(Model.Repository.Model.Assignments);
       ViewBag.OverdueTasks = GetOverduedTasksChart(Model.Repository.Model.Assignments);
+      ViewBag.AssignmentsPerPerson = GetAssignmentsPerPerson(Model.Repository.Model.Assignments);
 
       return View();
     }
@@ -37,8 +38,7 @@ namespace Catalog.Controllers
                     AllowPointSelect = true,
                     Cursor = Cursors.Pointer,
                     DataLabels = new PlotOptionsPieDataLabels { Enabled = false },
-                    ShowInLegend = true,
-                    //Events = new PlotOptionsPieEvents { Click = "function() {window.location.href = \""+ new UrlHelper(this.ControllerContext.RequestContext).Action("Index", "AsgList", new { taskTypeGuid = Model.Repository.TaskTypeGuids[0]}) +"\"}" , }
+                    ShowInLegend = true
                   }
                 })
                 .SetSeries(new Series
@@ -99,6 +99,50 @@ namespace Catalog.Controllers
       return chart;
     }
 
+    private Highcharts GetAssignmentsPerPerson(IEnumerable<Assignment> assignments)
+    {
+      var sortedListOfAssignments = GetAssignmentsByPerson(assignments);
+      var performers = sortedListOfAssignments.Select(s => s.PersonaName).ToArray();
+      var overdueData = sortedListOfAssignments.Select(s => new Point()
+      {
+        Name = "Просроченные",
+        Y = s.OverdueAssignments
+      }).ToArray();
+      var notOverdueData = sortedListOfAssignments.Select(s => new Point()
+      {
+        Name = "В срок",
+        Y = s.NotOverdueAssignments
+      }).ToArray();
+
+      var chart = new Highcharts("AssignmentsPerPersonChart")
+                .InitChart(new Chart { Type = ChartTypes.Bar, PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null, MarginTop = 50 })
+                .SetExporting(new Exporting() { Enabled = false })
+                .SetTitle(new Title { Text = "", Align = HorizontalAligns.Left })
+                .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
+                .SetLegend(new Legend { ItemStyle = "fontWeight: 'normal'" })
+                .SetPlotOptions(new PlotOptions
+                {
+                  Bar = new PlotOptionsBar
+                  {
+                    AllowPointSelect = true,
+                    Cursor = Cursors.Pointer,
+                    ShowInLegend = true,
+                    Stacking = Stackings.Normal
+                  }
+                })
+                .SetXAxis(new XAxis
+                {
+                  Categories = performers
+                })
+                .SetSeries(new Series[]
+                {
+                  new Series { Type = ChartTypes.Bar, Name = "Просроченные", Data = new Data(overdueData) },
+                  new Series { Type = ChartTypes.Bar, Name = "В срок", Data = new Data(notOverdueData) },
+                });
+
+      return chart;
+    }
+
     private Point[] GetSeries(IEnumerable<Assignment> assignments)
     {
       var group = assignments.GroupBy(x => x.TaskTypeGuid)
@@ -116,6 +160,21 @@ namespace Catalog.Controllers
         }).ToArray();
 
       return group;
+    }
+
+    private List<ViewModel.Primitives.PersonaWithNumbers> GetAssignmentsByPerson(IEnumerable<Assignment> assignments)
+    {
+      return assignments
+        .GroupBy(a => a.PerformerId)
+        .OrderByDescending(x => x.Count())
+        .Select(a => new ViewModel.Primitives.PersonaWithNumbers()
+        {
+          PersonaName = Model.Repository.Model.Performers.FirstOrDefault(p => p.Id == a.Key).Name,
+          OverdueAssignments = a.Where(s => s.Overdue > 0).Count(),
+          NotOverdueAssignments = a.Where(s => s.Overdue != 0).Count()
+        })
+        .Where(a => a.OverdueAssignments != 0 && a.NotOverdueAssignments != 0)
+        .ToList();
     }
   }
 }

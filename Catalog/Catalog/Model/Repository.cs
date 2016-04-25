@@ -25,7 +25,7 @@ namespace Catalog.Model
         while (model.Performers.Any(x => x.Id == performer.Id))
           performer = GetMockPerformer();
 
-        model.Performers.Add(GetMockPerformer());
+        model.Performers.Add(performer);
       }
 
       for (var i = 0; i < assignmentsCount; ++i)
