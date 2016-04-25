@@ -24,11 +24,13 @@ namespace Catalog.Controllers
       var assignments = new List<Assignment>();
 
       if (string.IsNullOrEmpty(taskTypeGuid))
-        assignments = Model.Repository.Model.Assignments.Skip(skipPages).Take(10).ToList();
+        assignments = Model.Repository.Model.Assignments.ToList();
       else
-        assignments = Model.Repository.Model.Assignments.Where(a => a.TaskTypeGuid == taskTypeGuid).Skip(skipPages).Take(10).ToList();
+        assignments = Model.Repository.Model.Assignments.Where(a => a.TaskTypeGuid == taskTypeGuid).ToList();
 
-      ViewBag.AsgList = assignments;
+      ViewBag.AllAsgListCount = (int)Math.Ceiling(assignments.Count / (double)10);
+      ViewBag.AsgList = assignments.Skip(skipPages).Take(10).ToList();
+      ViewBag.TaskTypeGuid = taskTypeGuid;
 
       var chart = new Highcharts("chart")
                 .InitChart(new Chart { PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })

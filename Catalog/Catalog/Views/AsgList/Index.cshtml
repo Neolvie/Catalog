@@ -17,17 +17,18 @@
 </div>
 
 <div class="row">
-    <div class="col-md-2">
-        <button id="button" onclick="AddRandomAsg()" class="btn btn-success">Добавить случайное задание</button>
-    </div>
-    <div class="col-md-offset-2 col-md-2">
-        <button class="btn btn-info" id="MiAButton">Мониторинг и анализ</button>
-    </div>
+        <button id="button" onclick="AddRandomAsg()" class="btn btn-success col-md-3">Добавить случайное задание</button>
+        <button id="ShowAllAssignments" class="btn btn-default col-md-3">Показать все задания</button>
+        <button class="btn btn-info col-md-3" id="MiAButton">Мониторинг и анализ</button>
 </div>
 
 <script>
     $('#MiAButton').click(function() {
         location.href = '@Url.Action("Index", "MiA")';
+    });
+
+    $("#ShowAllAssignments").click(function() {
+        location.href = '@Url.Action("Index", "AsgList")';
     });
 </script>
 
@@ -58,8 +59,7 @@
             }
             </tbody>
         </table>
-        @{ var totalPages = (int) Math.Ceiling(Model.Assignments.Count/(double) 10); }
-        @for (var i = 1; i <= totalPages; ++i)
+        @for (var i = 1; i <= ViewBag.AllAsgListCount; ++i)
         {
             if (i == ViewBag.Page)
             {
@@ -67,7 +67,14 @@
             }
             else
             {
-                <span style="margin: 5px 0 5px 0">@Html.ActionLink(i.ToString(), "Index", "AsgList", new {page = i}, null)</span>
+                <span style="margin: 5px 0 5px 0">@Html.ActionLink(i.ToString(),
+                                               "Index", "AsgList",
+                                               new
+                                               {
+                                                   page = i,
+                                                   taskTypeGuid = ViewBag.TaskTypeGuid
+                                               }, 
+                                               null)</span>
             }
         }
     </div>
