@@ -218,5 +218,6 @@ namespace Catalog.Controllers
         })
         .Where(a => a.OverdueAssignments != 0 && a.NotOverdueAssignments != 0)
         .ToList();
+    }
   }
 }
