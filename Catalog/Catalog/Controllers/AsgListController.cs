@@ -16,13 +16,19 @@ namespace Catalog.Controllers
   public class AsgListController : Controller
   {
     // GET: AssignmentList
-    public ActionResult Index(int page = 1)
+    public ActionResult Index(string taskTypeGuid = "", int page = 1)
     {
       ViewBag.Page = page;
 
       var skipPages = (page - 1)*10;
+      var assignments = new List<Assignment>();
 
-      ViewBag.AsgList = Model.Repository.Model.Assignments.Skip(skipPages).Take(10).ToList();
+      if (string.IsNullOrEmpty(taskTypeGuid))
+        assignments = Model.Repository.Model.Assignments.Skip(skipPages).Take(10).ToList();
+      else
+        assignments = Model.Repository.Model.Assignments.Where(a => a.TaskTypeGuid == taskTypeGuid).Skip(skipPages).Take(10).ToList();
+
+      ViewBag.AsgList = assignments;
 
       var chart = new Highcharts("chart")
                 .InitChart(new Chart { PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })

@@ -25,7 +25,7 @@ namespace Catalog.Controllers
     private Highcharts GetOverduedTasksChart(IEnumerable<Assignment> assignments)
     {
       var chart = new Highcharts("OverdueChart")
-                .InitChart(new Chart { PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null, MarginTop = 50})
+                .InitChart(new Chart { PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null, MarginTop = 50 })
                 .SetExporting(new Exporting() { Enabled = false })
                 .SetTitle(new Title { Text = "", Align = HorizontalAligns.Left })
                 .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
@@ -37,7 +37,8 @@ namespace Catalog.Controllers
                     AllowPointSelect = true,
                     Cursor = Cursors.Pointer,
                     DataLabels = new PlotOptionsPieDataLabels { Enabled = false },
-                    ShowInLegend = true
+                    ShowInLegend = true,
+                    //Events = new PlotOptionsPieEvents { Click = "function() {window.location.href = \""+ new UrlHelper(this.ControllerContext.RequestContext).Action("Index", "AsgList", new { taskTypeGuid = Model.Repository.TaskTypeGuids[0]}) +"\"}" , }
                   }
                 })
                 .SetSeries(new Series
@@ -62,7 +63,7 @@ namespace Catalog.Controllers
           PlotBorderWidth = null,
           MarginTop = 0
         })
-        .SetExporting(new Exporting() {Enabled = false})
+        .SetExporting(new Exporting() { Enabled = false })
         .SetTitle(new Title
         {
           Text = string.Format("{0}%", discipline),
@@ -71,7 +72,7 @@ namespace Catalog.Controllers
           Y = 8,
           Style = "fontSize: '36px', fontFamily: 'Arial'"
         })
-        .SetTooltip(new Tooltip {Enabled = false})
+        .SetTooltip(new Tooltip { Enabled = false })
         .SetPlotOptions(new PlotOptions
         {
           Pie = new PlotOptionsPie
@@ -80,7 +81,7 @@ namespace Catalog.Controllers
             InnerSize = new PercentageOrPixel(50, true),
             Size = new PercentageOrPixel(75, true),
             Cursor = Cursors.Pointer,
-            DataLabels = new PlotOptionsPieDataLabels {Enabled = false},
+            DataLabels = new PlotOptionsPieDataLabels { Enabled = false },
             ShowInLegend = false
           }
         })
@@ -98,11 +99,21 @@ namespace Catalog.Controllers
       return chart;
     }
 
-    private static Point[] GetSeries(IEnumerable<Assignment> assignments)
+    private Point[] GetSeries(IEnumerable<Assignment> assignments)
     {
       var group = assignments.GroupBy(x => x.TaskTypeName)
         .OrderByDescending(x => x.Count())
-        .Select(x => new Point { Name = x.Key, Y = x.Count() }).ToArray();
+        .Select(x => new Point
+        {
+          Name = x.Key,
+          Y = x.Count(),
+          Events = new PlotOptionsSeriesPointEvents()
+          {
+            Click = "function() {window.location.href = \""
+            + new UrlHelper(this.ControllerContext.RequestContext).Action("Index", "AsgList", new { taskTypeGuid = x.FirstOrDefault().TaskTypeGuid })
+              + "\"}"
+          }
+        }).ToArray();
 
       return group;
     }
