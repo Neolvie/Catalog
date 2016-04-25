@@ -101,16 +101,16 @@ namespace Catalog.Controllers
 
     private Point[] GetSeries(IEnumerable<Assignment> assignments)
     {
-      var group = assignments.GroupBy(x => x.TaskTypeName)
+      var group = assignments.GroupBy(x => x.TaskTypeGuid)
         .OrderByDescending(x => x.Count())
         .Select(x => new Point
         {
-          Name = x.Key,
+          Name = Model.Repository.TaskTypes[x.Key],
           Y = x.Count(),
           Events = new PlotOptionsSeriesPointEvents()
           {
             Click = "function() {window.location.href = \""
-            + new UrlHelper(this.ControllerContext.RequestContext).Action("Index", "AsgList", new { taskTypeGuid = x.FirstOrDefault().TaskTypeGuid })
+            + new UrlHelper(this.ControllerContext.RequestContext).Action("Index", "AsgList", new { taskTypeGuid = x.Key })
               + "\"}"
           }
         }).ToArray();
