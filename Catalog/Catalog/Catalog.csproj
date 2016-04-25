@@ -133,6 +133,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Model\Assignment.cs" />
+    <Compile Include="Model\CalendarEx.cs" />
     <Compile Include="Model\Helpers.cs" />
     <Compile Include="Model\Model.cs" />
     <Compile Include="Model\Performer.cs" />

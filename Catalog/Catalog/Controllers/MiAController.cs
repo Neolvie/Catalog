@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -116,6 +117,48 @@ namespace Catalog.Controllers
         }).ToArray();
 
       return group;
+    }
+
+    private Highcharts GetAssignmentPlot(List<Assignment> assignments)
+    {
+      var dateBegin = DateTime.Now.AddDays(-30);
+      var dateEnd = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
+
+      var assignmentsByDates = new List<DatePoint>();
+
+      foreach (var serie in CalendarEx.GetSeriePeriodsWithMaxPointInPeriod(100, CalendarEx.StepType.Days, dateBegin, dateEnd))
+      {
+        var datePoint = new DatePoint { Name = serie.PeriodEnd.ToString(CultureInfo.CurrentCulture) };
+
+        var dateAssignments = Helpers.FilterAssignmentsForPeriodWithActive(assignments, serie.PeriodBegin, serie.PeriodEnd);
+        datePoint.Total = dateAssignments.Count;
+
+        var overduedateAssignments = dateAssignments.Where(a => a.HasOverdueOnDate(serie.PeriodEnd)).ToList();
+        datePoint.Overdue = overduedateAssignments.Count;
+
+        assignmentsByDates.Add(datePoint);
+      }
+
+      return null;
+    }
+
+    public class DatePoint
+    {
+      public string Name;
+      public int Overdue;
+      public int Total;
+
+      public DatePoint(string name, int overdue, int total)
+      {
+        Name = name;
+        Overdue = overdue;
+        Total = total;
+      }
+
+      public DatePoint()
+      {
+
+      }
     }
   }
 }
