@@ -127,7 +127,7 @@ namespace Catalog.Controllers
                 {
                   Bar = new PlotOptionsBar
                   {
-                    AllowPointSelect = true,
+                    AllowPointSelect = false,
                     Cursor = Cursors.Pointer,
                     ShowInLegend = true,
                     Stacking = Stackings.Normal
@@ -166,34 +166,60 @@ namespace Catalog.Controllers
         assignmentsByDates.Add(datePoint);
       }
 
-      var categories = assignmentsByDates.Select(a => a.Name).ToArray();
       var overdueAssignments = assignmentsByDates.Select(a => new Point() { Name = a.Name, Y = a.Overdue }).ToArray();
       var totalAssignments = assignmentsByDates.Select(a => new Point() { Name = a.Name, Y = a.Total }).ToArray();
 
       var chart = new Highcharts("AssignmentsPlot")
-                .InitChart(new Chart { Type = ChartTypes.Area, PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })
+                .InitChart(new Chart { Type = ChartTypes.Spline, PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })
                 .SetExporting(new Exporting() { Enabled = false })
                 .SetTitle(new Title { Text = "", Align = HorizontalAligns.Left })
-                .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
+                .SetTooltip(new Tooltip { Shared = true })
                 .SetLegend(new Legend { ItemStyle = "fontWeight: 'normal'" })
                 .SetPlotOptions(new PlotOptions
                 {
                   Line = new PlotOptionsLine
                   {
                     AllowPointSelect = true,
-                    Cursor = Cursors.Pointer,
+                    Cursor = Cursors.Pointer,                    
                     ShowInLegend = true
                   }
                 })
+                .SetYAxis(new YAxis()
+                {
+                  Min = 0,
+                  Title = new YAxisTitle() { Text = "Задания" }
+                })
                 .SetXAxis(new XAxis
                 {
-                  Categories = categories,
+                  Type = AxisTypes.Datetime,
+                  DateTimeLabelFormats = new DateTimeLabel() { Day = "%d.%m.%Y", Week = "%d.%m.%Y", Month = "%d.%m.%Y" }
                 })
-                .SetSeries(new Series[]
+                .SetSeries(new []
                 {
-                  new Series { Type = ChartTypes.Line, Name = "Общее количество", Data = new Data(totalAssignments) },
-                  new Series { Type = ChartTypes.Line, Name = "Просроченные", Data = new Data(overdueAssignments) },
+                  new Series
+                  {
+                    Type = ChartTypes.Line,
+                    Name = "Общее количество",
+                    Data = new Data(totalAssignments),
+                    PlotOptionsSeries = new PlotOptionsSeries()
+                    {
+                      PointStart = new PointStart(DateTime.Now.AddDays(-30)),
+                      PointInterval = 24 * 3600 * 1000 // Один день в миллисекундах.
+                    }
+                  },
+                  new Series
+                  {
+                    Type = ChartTypes.Line,
+                    Name = "Просроченные",
+                    Data = new Data(overdueAssignments),
+                    PlotOptionsSeries = new PlotOptionsSeries()
+                    {
+                      PointStart = new PointStart(DateTime.Now.AddDays(-30)),
+                      PointInterval = 24 * 3600 * 1000 // Один день в миллисекундах.
+                    }
+                  },             
                 });
+
 
       return chart;
     }
@@ -221,12 +247,12 @@ namespace Catalog.Controllers
     {
       return assignments
         .GroupBy(a => a.PerformerId)
-        .OrderByDescending(x => x.Count())
+        .OrderByDescending(x => x.Count()).Take(10)
         .Select(a => new ViewModel.Primitives.PersonaWithNumbers()
         {
-          PersonaName = Model.Repository.Model.Performers.FirstOrDefault(p => p.Id == a.Key).Name,
-          OverdueAssignments = a.Where(s => s.Overdue > 0).Count(),
-          NotOverdueAssignments = a.Where(s => s.Overdue == 0).Count()
+          PersonaName = Model.Repository.Model.Performers.First(p => p.Id == a.Key).Name,
+          OverdueAssignments = a.Count(s => s.Overdue > 0),
+          NotOverdueAssignments = a.Count(s => s.Overdue == 0)
         })
         .Where(a => a.OverdueAssignments != 0 || a.NotOverdueAssignments != 0)
         .ToList();

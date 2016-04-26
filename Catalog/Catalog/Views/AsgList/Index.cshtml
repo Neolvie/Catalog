@@ -13,13 +13,13 @@
 
 <div style="margin-top: 20px">
     <span class="h2">Список заданий</span>
-    <span> (@Html.ActionLink("перегенерировать", "RegenerateList", "AsgList"))</span>
 </div>
 
 <div class="row">
         <button id="button" onclick="AddRandomAsg()" class="btn btn-success col-md-3">Добавить случайное задание</button>
         <button id="ShowAllAssignments" class="btn btn-default col-md-3">Показать все задания</button>
-        <button class="btn btn-info col-md-3" id="MiAButton">Мониторинг и анализ</button>
+    <button class="btn btn-info col-md-3" id="MiAButton">Мониторинг и анализ</button>
+    <button class="btn btn-danger col-md-3" id="Regenerate">Перегенерировать</button>
 </div>
 
 <script>
@@ -30,6 +30,10 @@
     $("#ShowAllAssignments").click(function() {
         location.href = '@Url.Action("Index", "AsgList")';
     });
+
+    $("#Regenerate").click(function() {
+        location.href = '@Url.Action("RegenerateList", "AsgList")';
+    })
 </script>
 
 <div class="row">
