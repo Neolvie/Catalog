@@ -118,7 +118,7 @@ namespace Catalog.Controllers
 
       var chart = new Highcharts("AssignmentsPerPersonChart")
 
-                .InitChart(new Chart { Type = ChartTypes.Bar, PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null, Height = null, })
+                .InitChart(new Chart { Type = ChartTypes.Bar, PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null, Height = 800 })
                 .SetExporting(new Exporting() { Enabled = false })
                 .SetTitle(new Title { Text = "", Align = HorizontalAligns.Left })
                 .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
@@ -155,7 +155,7 @@ namespace Catalog.Controllers
 
       foreach (var serie in CalendarEx.GetSeriePeriodsWithMaxPointInPeriod(100, CalendarEx.StepType.Days, dateBegin, dateEnd))
       {
-        var datePoint = new ViewModel.Primitives.DatePoint { Name = serie.PeriodEnd.ToString(CultureInfo.CurrentCulture) };
+        var datePoint = new ViewModel.Primitives.DatePoint { Name = serie.PeriodEnd.ToString("d",CultureInfo.CurrentCulture) };
 
         var dateAssignments = Helpers.FilterAssignmentsForPeriodWithActive(assignments.ToList(), serie.PeriodBegin, serie.PeriodEnd);
         datePoint.Total = dateAssignments.Count;
@@ -171,7 +171,7 @@ namespace Catalog.Controllers
       var totalAssignments = assignmentsByDates.Select(a => new Point() { Name = a.Name, Y = a.Total }).ToArray();
 
       var chart = new Highcharts("AssignmentsPlot")
-                .InitChart(new Chart { Type = ChartTypes.Line, PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })
+                .InitChart(new Chart { Type = ChartTypes.Area, PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })
                 .SetExporting(new Exporting() { Enabled = false })
                 .SetTitle(new Title { Text = "", Align = HorizontalAligns.Left })
                 .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
@@ -187,7 +187,7 @@ namespace Catalog.Controllers
                 })
                 .SetXAxis(new XAxis
                 {
-                  Categories = categories
+                  Categories = categories,
                 })
                 .SetSeries(new Series[]
                 {
