@@ -1,7 +1,7 @@
 ﻿
 @{
-    ViewBag.Title = "Мониторинг и анализ";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "Мониторинг и анализ";
+  Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <head>
     <script src="@Url.Content("~/Scripts/jquery-2.2.3.js")" type="text/javascript"></script>
@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-md-8">
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-6">
                     <div class="row">
                         <h3>Исполнительская дисциплина</h3>
                     </div>
@@ -20,7 +20,7 @@
                         <div style="position: relative; left: 0; top: 0;">@ViewBag.DisciplineChart</div>
                     </div>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-6">
                     <div class="row">
                         <h3>Задания c нарушением срока</h3>
                     </div>
@@ -28,14 +28,15 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-8">Динамика активных заданий</div>
+                <div class="col-md-8">
+                    <h3>Динамика активных заданий</h3>
+                    <div>@ViewBag.AssignmentsPlot</div>
+                </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="row">
-                <h3>Сотрудники с высокой загрузкой</h3>
-            </div>
-            <div class="row">@ViewBag.AssignmentsPerPerson</div>
+            <h3>Сотрудники с высокой загрузкой</h3>
+            <div>@ViewBag.AssignmentsPerPerson</div>
         </div>
     </div>
 </div>

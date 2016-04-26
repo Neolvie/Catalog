@@ -20,6 +20,7 @@ namespace Catalog.Controllers
       ViewBag.DisciplineChart = GetPerformerDisciplineChart(Model.Repository.Model.Assignments);
       ViewBag.OverdueTasks = GetOverduedTasksChart(Model.Repository.Model.Assignments);
       ViewBag.AssignmentsPerPerson = GetAssignmentsPerPerson(Model.Repository.Model.Assignments);
+      ViewBag.AssignmentsPlot = GetAssignmentsPlot(Model.Repository.Model.Assignments);
 
       return View();
     }
@@ -116,7 +117,8 @@ namespace Catalog.Controllers
       }).ToArray();
 
       var chart = new Highcharts("AssignmentsPerPersonChart")
-                .InitChart(new Chart { Type = ChartTypes.Bar, PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null, MarginTop = 50 })
+
+                .InitChart(new Chart { Type = ChartTypes.Bar, PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null, Height = null, })
                 .SetExporting(new Exporting() { Enabled = false })
                 .SetTitle(new Title { Text = "", Align = HorizontalAligns.Left })
                 .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
@@ -137,8 +139,60 @@ namespace Catalog.Controllers
                 })
                 .SetSeries(new Series[]
                 {
-                  new Series { Type = ChartTypes.Bar, Name = "Просроченные", Data = new Data(overdueData) },
                   new Series { Type = ChartTypes.Bar, Name = "В срок", Data = new Data(notOverdueData) },
+                  new Series { Type = ChartTypes.Bar, Name = "Просроченные", Data = new Data(overdueData) },
+                });
+
+      return chart;
+    }
+
+    private Highcharts GetAssignmentsPlot(IEnumerable<Assignment> assignments)
+    {
+      var dateBegin = DateTime.Now.AddDays(-30);
+      var dateEnd = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
+
+      var assignmentsByDates = new List<ViewModel.Primitives.DatePoint>();
+
+      foreach (var serie in CalendarEx.GetSeriePeriodsWithMaxPointInPeriod(100, CalendarEx.StepType.Days, dateBegin, dateEnd))
+      {
+        var datePoint = new ViewModel.Primitives.DatePoint { Name = serie.PeriodEnd.ToString(CultureInfo.CurrentCulture) };
+
+        var dateAssignments = Helpers.FilterAssignmentsForPeriodWithActive(assignments.ToList(), serie.PeriodBegin, serie.PeriodEnd);
+        datePoint.Total = dateAssignments.Count;
+
+        var overduedateAssignments = dateAssignments.Where(a => a.HasOverdueOnDate(serie.PeriodEnd)).ToList();
+        datePoint.Overdue = overduedateAssignments.Count;
+
+        assignmentsByDates.Add(datePoint);
+      }
+
+      var categories = assignmentsByDates.Select(a => a.Name).ToArray();
+      var overdueAssignments = assignmentsByDates.Select(a => new Point() { Name = a.Name, Y = a.Overdue }).ToArray();
+      var totalAssignments = assignmentsByDates.Select(a => new Point() { Name = a.Name, Y = a.Total }).ToArray();
+
+      var chart = new Highcharts("AssignmentsPlot")
+                .InitChart(new Chart { Type = ChartTypes.Line, PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })
+                .SetExporting(new Exporting() { Enabled = false })
+                .SetTitle(new Title { Text = "", Align = HorizontalAligns.Left })
+                .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
+                .SetLegend(new Legend { ItemStyle = "fontWeight: 'normal'" })
+                .SetPlotOptions(new PlotOptions
+                {
+                  Line = new PlotOptionsLine
+                  {
+                    AllowPointSelect = true,
+                    Cursor = Cursors.Pointer,
+                    ShowInLegend = true
+                  }
+                })
+                .SetXAxis(new XAxis
+                {
+                  Categories = categories
+                })
+                .SetSeries(new Series[]
+                {
+                  new Series { Type = ChartTypes.Line, Name = "Общее количество", Data = new Data(totalAssignments) },
+                  new Series { Type = ChartTypes.Line, Name = "Просроченные", Data = new Data(overdueAssignments) },
                 });
 
       return chart;
@@ -163,48 +217,6 @@ namespace Catalog.Controllers
       return group;
     }
 
-    private Highcharts GetAssignmentPlot(List<Assignment> assignments)
-    {
-      var dateBegin = DateTime.Now.AddDays(-30);
-      var dateEnd = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
-
-      var assignmentsByDates = new List<DatePoint>();
-
-      foreach (var serie in CalendarEx.GetSeriePeriodsWithMaxPointInPeriod(100, CalendarEx.StepType.Days, dateBegin, dateEnd))
-      {
-        var datePoint = new DatePoint { Name = serie.PeriodEnd.ToString(CultureInfo.CurrentCulture) };
-
-        var dateAssignments = Helpers.FilterAssignmentsForPeriodWithActive(assignments, serie.PeriodBegin, serie.PeriodEnd);
-        datePoint.Total = dateAssignments.Count;
-
-        var overduedateAssignments = dateAssignments.Where(a => a.HasOverdueOnDate(serie.PeriodEnd)).ToList();
-        datePoint.Overdue = overduedateAssignments.Count;
-
-        assignmentsByDates.Add(datePoint);
-      }
-
-      return null;
-    }
-
-    public class DatePoint
-    {
-      public string Name;
-      public int Overdue;
-      public int Total;
-
-      public DatePoint(string name, int overdue, int total)
-      {
-        Name = name;
-        Overdue = overdue;
-        Total = total;
-      }
-
-      public DatePoint()
-      {
-
-      }
-    }
-
     private List<ViewModel.Primitives.PersonaWithNumbers> GetAssignmentsByPerson(IEnumerable<Assignment> assignments)
     {
       return assignments
@@ -214,9 +226,9 @@ namespace Catalog.Controllers
         {
           PersonaName = Model.Repository.Model.Performers.FirstOrDefault(p => p.Id == a.Key).Name,
           OverdueAssignments = a.Where(s => s.Overdue > 0).Count(),
-          NotOverdueAssignments = a.Where(s => s.Overdue != 0).Count()
+          NotOverdueAssignments = a.Where(s => s.Overdue == 0).Count()
         })
-        .Where(a => a.OverdueAssignments != 0 && a.NotOverdueAssignments != 0)
+        .Where(a => a.OverdueAssignments != 0 || a.NotOverdueAssignments != 0)
         .ToList();
     }
   }
