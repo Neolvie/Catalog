@@ -19,67 +19,69 @@ namespace Catalog.Controllers
     public ActionResult Index(string taskTypeGuid = "", int page = 1)
     {
       ViewBag.Page = page;
+      if (!string.IsNullOrEmpty(taskTypeGuid))
+        ViewBag.Subtitle = Model.Repository.TaskTypes[taskTypeGuid];
 
-      var skipPages = (page - 1)*10;
+      var skipPages = (page - 1) * 10;
       var assignments = new List<Assignment>();
+      assignments = Model.Repository.Model.Assignments.ToList();
+      var filteredAssignments = assignments;
 
-      if (string.IsNullOrEmpty(taskTypeGuid))
-        assignments = Model.Repository.Model.Assignments.ToList();
-      else
-        assignments = Model.Repository.Model.Assignments.Where(a => a.TaskTypeGuid == taskTypeGuid).ToList();
+      if (!string.IsNullOrEmpty(taskTypeGuid))
+        filteredAssignments = filteredAssignments.Where(a => a.TaskTypeGuid == taskTypeGuid).ToList();
 
-      ViewBag.AllAsgListCount = (int)Math.Ceiling(assignments.Count / (double)10);
-      ViewBag.AsgList = assignments.Skip(skipPages).Take(10).ToList();
+      ViewBag.AllAsgListCount = (int)Math.Ceiling(filteredAssignments.Count / (double)10);
+      ViewBag.AsgList = filteredAssignments.Skip(skipPages).Take(10).ToList();
       ViewBag.TaskTypeGuid = taskTypeGuid;
 
       var chart = new Highcharts("chart")
                 .InitChart(new Chart { PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })
-                .SetTitle(new Title { Text = "Задания в разрезе типов задач", Align = HorizontalAligns.Left})
+                .SetTitle(new Title { Text = "Задания в разрезе типов задач", Align = HorizontalAligns.Left })
                 .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
-                .SetLegend( new Legend() { ItemStyle = "fontWeight: 'normal'"}) 
+                .SetLegend(new Legend() { ItemStyle = "fontWeight: 'normal'" })
                 .SetPlotOptions(new PlotOptions
                 {
                   Pie = new PlotOptionsPie
-                  {                    
+                  {
                     AllowPointSelect = true,
-                    Cursor = Cursors.Pointer,                    
-                    DataLabels = new PlotOptionsPieDataLabels { Enabled = false},
-                    ShowInLegend = true
+                    Cursor = Cursors.Pointer,
+                    DataLabels = new PlotOptionsPieDataLabels { Enabled = true, Formatter = "function() { return '<b>'+ this.y +'</b>'; }" },
+                    ShowInLegend = true,
                   }
                 })
                 .SetSeries(new Series
                 {                 
                   Type = ChartTypes.Pie,
                   Name = "Типы задач",
-                  Data = new Data(GetSeries(ViewBag.AsgList))
+                  Data = new Data(GetSeries(assignments))
                 });
 
       ViewBag.Chart = chart;
 
       return View(Model.Repository.Model);
-    }
+}
 
-    private static Point[] GetSeries(IEnumerable<Assignment> assignments)
-    {
-      var group = assignments.GroupBy(x => x.TaskTypeName)
-        .OrderByDescending(x => x.Count())
-        .Select(x => new Point { Name = x.Key, Y = x.Count() }).ToArray();
+private static Point[] GetSeries(IEnumerable<Assignment> assignments)
+{
+  var group = assignments.GroupBy(x => x.TaskTypeName)
+    .OrderByDescending(x => x.Count())
+    .Select(x => new Point { Name = x.Key, Y = x.Count() }).ToArray();
 
-      return group;
-    }
+  return group;
+}
 
-    public ActionResult RegenerateList()
-    {
-      Model.Repository.ResetModel();
+public ActionResult RegenerateList()
+{
+  Model.Repository.ResetModel();
 
-      return RedirectToAction("Index", "AsgList");
-    }
+  return RedirectToAction("Index", "AsgList");
+}
 
-    public ActionResult GetRandomAsg()
-    {
-      var asg = Model.Repository.Model.Assignments[new Random().Next(Model.Repository.Model.Assignments.Count)];
+public ActionResult GetRandomAsg()
+{
+  var asg = Model.Repository.Model.Assignments[new Random().Next(Model.Repository.Model.Assignments.Count)];
 
-      return Json(asg, JsonRequestBehavior.AllowGet);
-    }
+  return Json(asg, JsonRequestBehavior.AllowGet);
+}
   }
 }

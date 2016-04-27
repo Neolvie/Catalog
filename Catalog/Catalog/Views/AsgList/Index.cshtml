@@ -11,15 +11,15 @@
     <script src="@Url.Content("~/Scripts/Highcharts-4.0.1/js/highcharts-all.js")" type="text/javascript"></script>
 </head>
 
-<div style="margin-top: 20px">
-    <span class="h2">Список заданий</span>
-</div>
-
 <div class="row">
-        <button id="button" onclick="AddRandomAsg()" class="btn btn-success col-md-3">Добавить случайное задание</button>
-        <button id="ShowAllAssignments" class="btn btn-default col-md-3">Показать все задания</button>
+    <button id="button" onclick="AddRandomAsg()" class="btn btn-success col-md-3">Добавить случайное задание</button>
+    <button id="ShowAllAssignments" class="btn btn-default col-md-3">Показать все задания</button>
     <button class="btn btn-info col-md-3" id="MiAButton">Мониторинг и анализ</button>
     <button class="btn btn-danger col-md-3" id="Regenerate">Перегенерировать</button>
+</div>
+
+<div class="page-header" style="margin-top: 20px">
+    <h1>Список заданий<br><small>@ViewBag.Subtitle</small></h1>
 </div>
 
 <script>
