@@ -104,16 +104,16 @@ namespace Catalog.Controllers
     private Highcharts GetAssignmentsPerPerson(IEnumerable<Assignment> assignments)
     {
       var sortedListOfAssignments = GetAssignmentsByPerson(assignments);
-      var performers = sortedListOfAssignments.Select(s => s.PersonaName).ToArray();
+      var performers = sortedListOfAssignments.Select(s => s.Name).ToArray();
       var overdueData = sortedListOfAssignments.Select(s => new Point()
       {
         Name = "Просроченные",
-        Y = s.OverdueAssignments
+        Y = (int)s.Values[0]
       }).ToArray();
       var notOverdueData = sortedListOfAssignments.Select(s => new Point()
       {
         Name = "В срок",
-        Y = s.NotOverdueAssignments
+        Y = (int)s.Values[1]
       }).ToArray();
 
       var chart = new Highcharts("AssignmentsPerPersonChart")
@@ -243,18 +243,13 @@ namespace Catalog.Controllers
       return group;
     }
 
-    private List<ViewModel.Primitives.PersonaWithNumbers> GetAssignmentsByPerson(IEnumerable<Assignment> assignments)
+    private List<ViewModel.Primitives.MultyYPoint> GetAssignmentsByPerson(IEnumerable<Assignment> assignments)
     {
       return assignments
         .GroupBy(a => a.PerformerId)
         .OrderByDescending(x => x.Count()).Take(10)
-        .Select(a => new ViewModel.Primitives.PersonaWithNumbers()
-        {
-          PersonaName = Model.Repository.Model.Performers.First(p => p.Id == a.Key).Name,
-          OverdueAssignments = a.Count(s => s.Overdue > 0),
-          NotOverdueAssignments = a.Count(s => s.Overdue == 0)
-        })
-        .Where(a => a.OverdueAssignments != 0 || a.NotOverdueAssignments != 0)
+        .Select(a => new ViewModel.Primitives.MultyYPoint(Model.Repository.Model.Performers.First(p => p.Id == a.Key).Name, new object[] { a.Count(s => s.Overdue > 0), a.Count(s => s.Overdue == 0) }))
+        .Where(a => (int)a.Values[0] != 0 || (int)a.Values[1] != 0)
         .ToList();
     }
   }

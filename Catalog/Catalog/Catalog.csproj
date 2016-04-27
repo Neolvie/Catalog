@@ -132,6 +132,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\Colors.cs" />
     <Compile Include="Model\Assignment.cs" />
     <Compile Include="Model\CalendarEx.cs" />
     <Compile Include="Model\Helpers.cs" />

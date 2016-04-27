@@ -1,4 +1,6 @@
-﻿namespace Catalog.ViewModel.Primitives
+﻿using System.Collections.Generic;
+
+namespace Catalog.ViewModel.Primitives
 {
   public class PersonaWithNumbers
   {
@@ -23,6 +25,20 @@
     public DatePoint()
     {
 
+    }
+  }
+
+  public class MultyYPoint
+  {
+    public string Name;
+    public List<object> Values;
+
+    public MultyYPoint(string name, object[] values)
+    {
+      this.Name = name;
+      Values = new List<object>();
+      foreach (var value in values)
+        Values.Add(value);
     }
   }
 }
