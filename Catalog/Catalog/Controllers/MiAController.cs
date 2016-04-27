@@ -148,7 +148,7 @@ namespace Catalog.Controllers
 
     private Highcharts GetAssignmentsPlot(IEnumerable<Assignment> assignments)
     {
-      var dateBegin = DateTime.Now.AddDays(-30);
+      var dateBegin = DateTime.Now.Date.AddDays(-30);
       var dateEnd = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
 
       var assignmentsByDates = new List<ViewModel.Primitives.DatePoint>();
