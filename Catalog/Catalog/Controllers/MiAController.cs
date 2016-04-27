@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Catalog.Helpers;
 using Catalog.Model;
 using DotNet.Highcharts;
 using DotNet.Highcharts.Enums;
@@ -55,7 +56,7 @@ namespace Catalog.Controllers
 
     private Highcharts GetPerformerDisciplineChart(IEnumerable<Assignment> assignments)
     {
-      var discipline = 66;
+      var discipline = new Random().Next(1, 100);
 
       var chart = new Highcharts("PerformerDisciplineChart")
         .InitChart(new Chart
@@ -93,8 +94,8 @@ namespace Catalog.Controllers
           Name = "Исполнительская дисциплина",
           Data = new Data(new[]
           {
-            new Point() {Y = discipline},
-            new Point() {Y = 100 - discipline}
+            new Point() {Y = discipline, Color = ChartColors.Parse("#ffffae18") },
+            new Point() {Y = 100 - discipline, Color = ChartColors.Parse("#ffe0e0e0") }
           })
         });
 
@@ -139,8 +140,8 @@ namespace Catalog.Controllers
                 })
                 .SetSeries(new Series[]
                 {
-                  new Series { Type = ChartTypes.Bar, Name = "В срок", Data = new Data(notOverdueData) },
-                  new Series { Type = ChartTypes.Bar, Name = "Просроченные", Data = new Data(overdueData) },
+                  new Series { Type = ChartTypes.Bar, Name = "В срок", Data = new Data(notOverdueData), Color = ChartColors.Color3 },
+                  new Series { Type = ChartTypes.Bar, Name = "Просроченные", Data = new Data(overdueData), Color = ChartColors.Red }
                 });
 
       return chart;
@@ -157,7 +158,7 @@ namespace Catalog.Controllers
       {
         var datePoint = new ViewModel.Primitives.DatePoint { Name = serie.PeriodEnd.ToString("d",CultureInfo.CurrentCulture) };
 
-        var dateAssignments = Helpers.FilterAssignmentsForPeriodWithActive(assignments.ToList(), serie.PeriodBegin, serie.PeriodEnd);
+        var dateAssignments = Model.Helpers.FilterAssignmentsForPeriodWithActive(assignments.ToList(), serie.PeriodBegin, serie.PeriodEnd);
         datePoint.Total = dateAssignments.Count;
 
         var overduedateAssignments = dateAssignments.Where(a => a.HasOverdueOnDate(serie.PeriodEnd)).ToList();
@@ -201,6 +202,7 @@ namespace Catalog.Controllers
                     Type = ChartTypes.Line,
                     Name = "Общее количество",
                     Data = new Data(totalAssignments),
+                    Color = ChartColors.Color1,
                     PlotOptionsSeries = new PlotOptionsSeries()
                     {
                       PointStart = new PointStart(DateTime.Now.AddDays(-30)),
@@ -212,6 +214,7 @@ namespace Catalog.Controllers
                     Type = ChartTypes.Line,
                     Name = "Просроченные",
                     Data = new Data(overdueAssignments),
+                    Color = ChartColors.Red,
                     PlotOptionsSeries = new PlotOptionsSeries()
                     {
                       PointStart = new PointStart(DateTime.Now.AddDays(-30)),
@@ -226,12 +229,14 @@ namespace Catalog.Controllers
 
     private Point[] GetSeries(IEnumerable<Assignment> assignments)
     {
+      var i = 0;
       var group = assignments.GroupBy(x => x.TaskTypeGuid)
         .OrderByDescending(x => x.Count())
         .Select(x => new Point
         {
           Name = Model.Repository.TaskTypes[x.Key],
           Y = x.Count(),
+          Color = ChartColors.GetByIndex(i++),
           Events = new PlotOptionsSeriesPointEvents()
           {
             Click = "function() {window.location.href = \""

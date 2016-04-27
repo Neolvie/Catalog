@@ -83,6 +83,7 @@ namespace Catalog.Model
       TaskTypes.Add("77f43035-9f23-4a19-9882-5a6a2cd5c9c7", "Задача на свободное согласование");
       TaskTypes.Add("c290b098-12c7-487d-bb38-73e2c98f9789", "Задача на исполнение поручения");
       TaskTypes.Add("4ef03457-8b42-4239-a3c5-d4d05e61f0b6", "Задача на рассмотрение документа");
+      TaskTypes.Add("0E1FF429-C11D-4140-9DF1-10717CF0E9A7", "Простая задача"); // Этот гуид сгенерил студией. Никакого отношения к простой задаче он не имеет.
 
       TaskTypeGuids = TaskTypes.Select(x => x.Key).ToList();
     }
