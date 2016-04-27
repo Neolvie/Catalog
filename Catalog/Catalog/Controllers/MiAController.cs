@@ -104,18 +104,15 @@ namespace Catalog.Controllers
 
     private Highcharts GetAssignmentsPerPerson(IEnumerable<Assignment> assignments)
     {
-      var sortedListOfAssignments = GetAssignmentsByPerson(assignments);
+      var sortedListOfAssignments = assignments
+        .GroupBy(a => a.PerformerId)
+        .OrderByDescending(x => x.Count()).Take(10)
+        .Select(a => new ViewModel.Primitives.AssignmentsCountPoint(Model.Repository.Model.Performers.First(p => p.Id == a.Key).Name, a.Count(s => s.Overdue > 0), a.Count()))
+        .Where(p => p.Overdue != 0 || p.InTime != 0)
+        .ToList(); ;
       var performers = sortedListOfAssignments.Select(s => s.Name).ToArray();
-      var overdueData = sortedListOfAssignments.Select(s => new Point()
-      {
-        Name = "Просроченные",
-        Y = (int)s.Values[0]
-      }).ToArray();
-      var notOverdueData = sortedListOfAssignments.Select(s => new Point()
-      {
-        Name = "В срок",
-        Y = (int)s.Values[1]
-      }).ToArray();
+      var overdueData = sortedListOfAssignments.Select(s => s.GetOverduePoint()).ToArray();
+      var notOverdueData = sortedListOfAssignments.Select(s => s.GetInTimePoint()).ToArray();
 
       var chart = new Highcharts("AssignmentsPerPersonChart")
 
@@ -152,11 +149,11 @@ namespace Catalog.Controllers
       var dateBegin = DateTime.Now.Date.AddDays(-30);
       var dateEnd = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
 
-      var assignmentsByDates = new List<ViewModel.Primitives.DatePoint>();
+      var assignmentsByDates = new List<ViewModel.Primitives.AssignmentsCountPoint>();
 
       foreach (var serie in CalendarEx.GetSeriePeriodsWithMaxPointInPeriod(100, CalendarEx.StepType.Days, dateBegin, dateEnd))
       {
-        var datePoint = new ViewModel.Primitives.DatePoint { Name = serie.PeriodEnd.ToString("d",CultureInfo.CurrentCulture) };
+        var datePoint = new ViewModel.Primitives.AssignmentsCountPoint { Name = serie.PeriodEnd.ToString("d",CultureInfo.CurrentCulture) };
 
         var dateAssignments = Model.Helpers.FilterAssignmentsForPeriodWithActive(assignments.ToList(), serie.PeriodBegin, serie.PeriodEnd);
         datePoint.Total = dateAssignments.Count;
@@ -246,16 +243,6 @@ namespace Catalog.Controllers
         }).ToArray();
 
       return group;
-    }
-
-    private List<ViewModel.Primitives.MultyYPoint> GetAssignmentsByPerson(IEnumerable<Assignment> assignments)
-    {
-      return assignments
-        .GroupBy(a => a.PerformerId)
-        .OrderByDescending(x => x.Count()).Take(10)
-        .Select(a => new ViewModel.Primitives.MultyYPoint(Model.Repository.Model.Performers.First(p => p.Id == a.Key).Name, new object[] { a.Count(s => s.Overdue > 0), a.Count(s => s.Overdue == 0) }))
-        .Where(a => (int)a.Values[0] != 0 || (int)a.Values[1] != 0)
-        .ToList();
     }
   }
 }

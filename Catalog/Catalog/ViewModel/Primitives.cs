@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DotNet.Highcharts.Options;
 
 namespace Catalog.ViewModel.Primitives
 {
@@ -9,36 +10,56 @@ namespace Catalog.ViewModel.Primitives
     public int NotOverdueAssignments;
   }
 
-  public class DatePoint
+  public class AssignmentsCountPoint
   {
     public string Name;
     public int Overdue;
     public int Total;
+    public int InTime
+    {
+      get
+      {
+        return this.Total - this.Overdue;
+      }
+    }
 
-    public DatePoint(string name, int overdue, int total)
+    public AssignmentsCountPoint()
+    {
+
+    }
+
+    public AssignmentsCountPoint(string name, int overdue, int total)
     {
       Name = name;
       Overdue = overdue;
       Total = total;
     }
 
-    public DatePoint()
+    public Point GetOverduePoint()
     {
-
+      return new Point()
+      {
+        Name = "Просроченные",
+        Y = this.Overdue
+      };
     }
-  }
 
-  public class MultyYPoint
-  {
-    public string Name;
-    public List<object> Values;
-
-    public MultyYPoint(string name, object[] values)
+    public Point GetInTimePoint()
     {
-      this.Name = name;
-      Values = new List<object>();
-      foreach (var value in values)
-        Values.Add(value);
+      return new Point()
+      {
+        Name = "В срок",
+        Y = this.InTime
+      };
+    }
+
+    public Point GetTotalPoint()
+    {
+      return new Point()
+      {
+        Name = "Общее количество",
+        Y = this.Overdue
+      };
     }
   }
 }
