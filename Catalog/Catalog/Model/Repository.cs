@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Catalog.Model
 {
@@ -14,7 +15,7 @@ namespace Catalog.Model
 
     public static Model Model => _model ?? (_model = GetMockModel(25, 500));
 
-    public static Model GetMockModel(int performersCount = 10, int assignmentsCount = 20)
+    public static Model GetMockModel(int performersCount, int assignmentsCount)
     {
       var model = new Model();
 
@@ -45,16 +46,45 @@ namespace Catalog.Model
     {
       var asg = new Assignment();
 
-      asg.Created = DateTime.Now.AddDays(-new Random().Next(30));
-      asg.Deadline = asg.Created.AddDays(new Random().Next(25));
-      asg.Id = new Random().Next(100000);
-      asg.InWork = Convert.ToBoolean(new Random().Next(0, 2));
-      asg.Modified = asg.Created.AddDays(new Random().Next(20));
-      asg.PerformerId = performers[new Random().Next(performers.Count)].Id;
-      asg.TaskId = new Random().Next(5000);
-      asg.TaskTypeGuid = TaskTypeGuids[new Random().Next(TaskTypeGuids.Count)];
-      asg.Name = $"{Guid.NewGuid()}, {Guid.NewGuid()}";
+      using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
+      {
+        byte[] data = new byte[4];
 
+        rng.GetBytes(data);
+        var randomNumber = Math.Abs(BitConverter.ToInt32(data, 0));
+        asg.Created = DateTime.Now.AddDays(-randomNumber % 30);
+
+        rng.GetBytes(data);
+        randomNumber = Math.Abs(BitConverter.ToInt32(data, 0));
+        int[] deadline = {7, 14};
+        asg.Deadline = asg.Created.AddDays(deadline[randomNumber % 2]);
+
+        rng.GetBytes(data);
+        randomNumber = Math.Abs(BitConverter.ToInt32(data, 0));
+        asg.Id = randomNumber % 100000;
+
+        rng.GetBytes(data);
+        randomNumber = Math.Abs(BitConverter.ToInt32(data, 0));
+        asg.InWork = Convert.ToBoolean(randomNumber % 2);
+
+        rng.GetBytes(data);
+        randomNumber = Math.Abs(BitConverter.ToInt32(data, 0));
+        asg.Modified = asg.Created.AddDays(randomNumber % 20);
+
+        rng.GetBytes(data);
+        randomNumber = Math.Abs(BitConverter.ToInt32(data, 0));
+        asg.PerformerId = performers[randomNumber % performers.Count].Id;
+
+        rng.GetBytes(data);
+        randomNumber = Math.Abs(BitConverter.ToInt32(data, 0));
+        asg.TaskId = randomNumber % 5000;
+
+        rng.GetBytes(data);
+        randomNumber = Math.Abs(BitConverter.ToInt32(data, 0));
+        asg.TaskTypeGuid = TaskTypeGuids[randomNumber % TaskTypeGuids.Count];
+
+        asg.Name = $"{Guid.NewGuid()}, {Guid.NewGuid()}";
+      }
       return asg;
     }
 
