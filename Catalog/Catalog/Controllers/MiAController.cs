@@ -28,30 +28,7 @@ namespace Catalog.Controllers
 
     private Highcharts GetOverduedTasksChart(IEnumerable<Assignment> assignments)
     {
-      var chart = new Highcharts("OverdueChart")
-                .InitChart(new Chart { PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null, MarginTop = 50 })
-                .SetExporting(new Exporting() { Enabled = false })
-                .SetTitle(new Title { Text = "", Align = HorizontalAligns.Left })
-                .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
-                .SetLegend(new Legend { ItemStyle = "fontWeight: 'normal'" })
-                .SetPlotOptions(new PlotOptions
-                {
-                  Pie = new PlotOptionsPie
-                  {
-                    AllowPointSelect = true,
-                    Cursor = Cursors.Pointer,
-                    DataLabels = new PlotOptionsPieDataLabels { Enabled = false },
-                    ShowInLegend = true
-                  }
-                })
-                .SetSeries(new Series
-                {
-                  Type = ChartTypes.Pie,
-                  Name = "Типы задач",
-                  Data = new Data(GetSeries(assignments))
-                });
-
-      return chart;
+      return ViewModel.AssignmentsViewModel.GetAssignmentsByTypePieChart(assignments, this.ControllerContext);
     }
 
     private Highcharts GetPerformerDisciplineChart(IEnumerable<Assignment> assignments)
@@ -222,27 +199,6 @@ namespace Catalog.Controllers
 
 
       return chart;
-    }
-
-    private Point[] GetSeries(IEnumerable<Assignment> assignments)
-    {
-      var i = 0;
-      var group = assignments.GroupBy(x => x.TaskTypeGuid)
-        .OrderByDescending(x => x.Count())
-        .Select(x => new Point
-        {
-          Name = Model.Repository.TaskTypes[x.Key],
-          Y = x.Count(),
-          Color = ChartColors.GetByIndex(i++),
-          Events = new PlotOptionsSeriesPointEvents()
-          {
-            Click = "function() {window.location.href = \""
-            + new UrlHelper(this.ControllerContext.RequestContext).Action("Index", "AsgList", new { taskTypeGuid = x.Key })
-              + "\"}"
-          }
-        }).ToArray();
-
-      return group;
     }
   }
 }

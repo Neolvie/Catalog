@@ -34,27 +34,7 @@ namespace Catalog.Controllers
       ViewBag.AsgList = filteredAssignments.Skip(skipPages).Take(10).ToList();
       ViewBag.TaskTypeGuid = taskTypeGuid;
 
-      var chart = new Highcharts("chart")
-                .InitChart(new Chart { PlotShadow = false, PlotBackgroundColor = null, PlotBorderWidth = null })
-                .SetTitle(new Title { Text = "Задания в разрезе типов задач", Align = HorizontalAligns.Left })
-                .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.point.name +'</b>: '+ this.y; }" })
-                .SetLegend(new Legend() { ItemStyle = "fontWeight: 'normal'" })
-                .SetPlotOptions(new PlotOptions
-                {
-                  Pie = new PlotOptionsPie
-                  {
-                    AllowPointSelect = true,
-                    Cursor = Cursors.Pointer,
-                    DataLabels = new PlotOptionsPieDataLabels { Enabled = true, Formatter = "function() { return '<b>'+ this.y +'</b>'; }" },
-                    ShowInLegend = true,
-                  }
-                })
-                .SetSeries(new Series
-                {                 
-                  Type = ChartTypes.Pie,
-                  Name = "Типы задач",
-                  Data = new Data(GetSeries(assignments))
-                });
+      var chart = ViewModel.AssignmentsViewModel.GetAssignmentsByTypePieChart(assignments, this.ControllerContext);
 
       ViewBag.Chart = chart;
 
