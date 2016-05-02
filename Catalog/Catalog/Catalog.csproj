@@ -223,6 +223,7 @@
     <Content Include="Views\Performer\Index.cshtml" />
     <Content Include="Views\Asg\Index.cshtml" />
     <Content Include="Views\MiA\Index.cshtml" />
+    <Content Include="Views\AsgList\AsgList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

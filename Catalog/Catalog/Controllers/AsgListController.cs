@@ -38,8 +38,8 @@ namespace Catalog.Controllers
 
       ViewBag.Chart = chart;
 
-      return View(Model.Repository.Model);
-}
+      return PartialView("AsgList", Model.Repository.Model); //View(Model.Repository.Model);
+    }
 
 private static Point[] GetSeries(IEnumerable<Assignment> assignments)
 {
