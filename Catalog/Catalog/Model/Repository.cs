@@ -13,7 +13,7 @@ namespace Catalog.Model
 
     private static Model _model;
 
-    public static Model Model => _model ?? (_model = GetMockModel(25, 500));
+    public static Model Model => _model ?? (_model = GetMockModel(11, 70));
 
     public static Model GetMockModel(int performersCount, int assignmentsCount)
     {

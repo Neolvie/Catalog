@@ -18,8 +18,8 @@
     <button class="btn btn-danger col-md-3" id="Regenerate">Перегенерировать</button>
 </div>
 
-<div class="page-header" style="margin-top: 20px">
-    <h1>Список заданий<br><small>@ViewBag.Subtitle</small></h1>
+<div class="page-header" style="margin-top: 20px; margin-bottom: 0">
+    <h2>Список заданий<br><small>@ViewBag.Subtitle</small></h2>
 </div>
 
 <script>
@@ -36,11 +36,47 @@
     })
 </script>
 
-<div id="AsgList">
-    @RenderBody()
+<div class="loading" id="divLoading">
+    <div class="progress" style="width:40%; margin-left:30%; margin-top: 100px">
+        <div class="progress-bar progress-bar-striped active" style="width:100%;">
+            Загрузка
+        </div>
+    </div>
 </div>
 
+<div id="AsgList" style="display: none;"> </div>
+
 <script>
+    $(document).ready(function() {
+        $.get("/asglist/GetAssignments", function (r) {
+            $("#AsgList").html(r);
+            completeLoadList();
+        });
+    });
+
+    function completeLoadList(f) {
+        var t = setTimeout(function () {
+            $("#divLoading").fadeOut(200, function () {
+                $("#AsgList").fadeIn(200);
+            });
+        }, 400);
+    }
+
+    function beginLoadList() {
+        $("#AsgList").fadeOut(200, function () {
+            $("#divLoading").fadeIn(200);
+        });
+    }
+
+    function loadPage(num) {
+        beginLoadList();
+
+        $.get("/asglist/GetAssignments/?page=" + num.toString(), function (r) {
+            $("#AsgList").html(r);
+            completeLoadList();
+        });
+    }
+
     function AddRandomAsg() {
         $.get('@Url.Action("GetRandomAsg", "AsgList")', function (asg) {
             $("#newAsg").text = asg;

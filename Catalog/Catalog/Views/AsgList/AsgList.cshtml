@@ -1,12 +1,9 @@
 ﻿@using System.Globalization
 @using Catalog.Model
-@{
-    Layout = "Index.cshtml";
-}
 
 <div class="row">
     <div class="col-md-8">
-        <table class="table">
+        <table class="table table-responsive">
             <thead>
                 <tr>
                     <th>Ид</th>
@@ -39,16 +36,7 @@
             }
             else
             {
-            <span style="margin: 5px 0 5px 0">
-                @Html.ActionLink(i.ToString(),
-                                               "Index", "AsgList",
-                                               new
-                                               {
-                                                   page = i,
-                                                   taskTypeGuid = ViewBag.TaskTypeGuid
-                                               },
-                                               null)
-        </span>
+            <span style="margin: 5px 0 5px 0"><a href="#" onclick="loadPage(@i)">@i</a> </span>
             }
         }
     </div>

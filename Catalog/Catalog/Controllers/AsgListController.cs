@@ -15,14 +15,21 @@ namespace Catalog.Controllers
 {
   public class AsgListController : Controller
   {
-    // GET: AssignmentList
-    public ActionResult Index(string taskTypeGuid = "", int page = 1)
+    public ActionResult Index()
     {
+      return View();
+    }
+
+    // GET: AssignmentList
+    public ActionResult GetAssignments(string taskTypeGuid = "", int page = 1)
+    {
+      var asgPerPage = 7;
+
       ViewBag.Page = page;
       if (!string.IsNullOrEmpty(taskTypeGuid))
         ViewBag.Subtitle = Model.Repository.TaskTypes[taskTypeGuid];
 
-      var skipPages = (page - 1) * 10;
+      var skipPages = (page - 1) * asgPerPage;
       var assignments = new List<Assignment>();
       assignments = Model.Repository.Model.Assignments.ToList();
       var filteredAssignments = assignments;
@@ -30,38 +37,30 @@ namespace Catalog.Controllers
       if (!string.IsNullOrEmpty(taskTypeGuid))
         filteredAssignments = filteredAssignments.Where(a => a.TaskTypeGuid == taskTypeGuid).ToList();
 
-      ViewBag.AllAsgListCount = (int)Math.Ceiling(filteredAssignments.Count / (double)10);
-      ViewBag.AsgList = filteredAssignments.Skip(skipPages).Take(10).ToList();
+      ViewBag.AllAsgListCount = (int)Math.Ceiling(filteredAssignments.Count / (double)asgPerPage);
+      var pageAsgs = filteredAssignments.Skip(skipPages).Take(asgPerPage).ToList();
+      ViewBag.AsgList = pageAsgs;
       ViewBag.TaskTypeGuid = taskTypeGuid;
 
-      var chart = ViewModel.AssignmentsViewModel.GetAssignmentsByTypePieChart(assignments, this.ControllerContext);
+      var chart = ViewModel.AssignmentsViewModel.GetAssignmentsByTypePieChart(pageAsgs, this.ControllerContext);
 
       ViewBag.Chart = chart;
 
       return PartialView("AsgList", Model.Repository.Model); //View(Model.Repository.Model);
     }
 
-private static Point[] GetSeries(IEnumerable<Assignment> assignments)
-{
-  var group = assignments.GroupBy(x => x.TaskTypeName)
-    .OrderByDescending(x => x.Count())
-    .Select(x => new Point { Name = x.Key, Y = x.Count() }).ToArray();
+    public ActionResult RegenerateList()
+    {
+      Model.Repository.ResetModel();
 
-  return group;
-}
+      return RedirectToAction("Index", "AsgList");
+    }
 
-public ActionResult RegenerateList()
-{
-  Model.Repository.ResetModel();
+    public ActionResult GetRandomAsg()
+    {
+      var asg = Model.Repository.Model.Assignments[new Random().Next(Model.Repository.Model.Assignments.Count)];
 
-  return RedirectToAction("Index", "AsgList");
-}
-
-public ActionResult GetRandomAsg()
-{
-  var asg = Model.Repository.Model.Assignments[new Random().Next(Model.Repository.Model.Assignments.Count)];
-
-  return Json(asg, JsonRequestBehavior.AllowGet);
-}
+      return Json(asg, JsonRequestBehavior.AllowGet);
+    }
   }
 }
