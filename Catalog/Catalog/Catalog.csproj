@@ -224,6 +224,7 @@
     <Content Include="Views\Asg\Index.cshtml" />
     <Content Include="Views\MiA\Index.cshtml" />
     <Content Include="Views\AsgList\AsgList.cshtml" />
+    <None Include="Views\AsgList\AsgPieChart.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

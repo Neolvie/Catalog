@@ -15,7 +15,7 @@ namespace Catalog.Controllers
 {
   public class AsgListController : Controller
   {
-    public ActionResult Index()
+    public ActionResult Index(string taskTypeGuid = "", int page = 1)
     {
       return View();
     }
@@ -42,11 +42,17 @@ namespace Catalog.Controllers
       ViewBag.AsgList = pageAsgs;
       ViewBag.TaskTypeGuid = taskTypeGuid;
 
-      var chart = ViewModel.AssignmentsViewModel.GetAssignmentsByTypePieChart(pageAsgs, this.ControllerContext);
+      return PartialView("AsgList", Model.Repository.Model); //View(Model.Repository.Model);
+    }
+
+    public ActionResult GetAssignmentsPieChart()
+    {
+      var assignments = new List<Assignment>();
+      assignments = Model.Repository.Model.Assignments.ToList();
+      var chart = ViewModel.AssignmentsViewModel.GetAssignmentsByTypePieChart(assignments, this.ControllerContext);
 
       ViewBag.Chart = chart;
-
-      return PartialView("AsgList", Model.Repository.Model); //View(Model.Repository.Model);
+      return PartialView("AsgPieChart", Model.Repository.Model);
     }
 
     public ActionResult RegenerateList()

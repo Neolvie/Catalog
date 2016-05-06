@@ -1,46 +1,39 @@
 ﻿@using System.Globalization
 @using Catalog.Model
 
-<div class="row">
-    <div class="col-md-8">
-        <table class="table table-responsive">
-            <thead>
-                <tr>
-                    <th>Ид</th>
-                    <th>Тема</th>
-                    <th>Исполнитель</th>
-                    <th>Срок</th>
-                    <th>Статус</th>
-                    <th>Просрочка</th>
-                </tr>
-            </thead>
-            <tbody id="AsgListTable">
-                @foreach (var asg in (List<Assignment>)ViewBag.AsgList)
-                {
-                <tr @(asg.HasOverdue ? "style=background-color:#FFE9DC" : "")>
-                    <td>@Html.ActionLink(asg.Id.ToString(), "Index", "Asg", new { id = asg.Id }, null)</td>
-                    <td>@asg.Name</td>
-                    <td>@Html.ActionLink(asg.Performer.Name, "Index", "Performer", new { id = asg.Performer.Id }, null)</td>
-                    <td>@(asg.Deadline?.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture) ?? "-")</td>
-                    <td>@asg.Status</td>
-                    <td>@(asg.HasOverdue ? asg.Overdue.ToString() : "-")</td>
-                </tr>
-                }
-            </tbody>
-        </table>
-        @for (var i = 1; i <= ViewBag.AllAsgListCount; ++i)
+    <table class="table table-responsive">
+        <thead>
+        <tr>
+            <th>Ид</th>
+            <th>Тема</th>
+            <th>Исполнитель</th>
+            <th>Срок</th>
+            <th>Статус</th>
+            <th>Просрочка</th>
+        </tr>
+        </thead>
+        <tbody id="AsgListTable">
+        @foreach (var asg in (List<Assignment>) ViewBag.AsgList)
         {
-            if (i == ViewBag.Page)
-            {
-            <span style="margin: 5px 0 5px 0">@i</span>
-            }
-            else
-            {
-            <span style="margin: 5px 0 5px 0"><a href="#" onclick="loadPage(@i)">@i</a> </span>
-            }
+            <tr @(asg.HasOverdue ? "style=background-color:#FFE9DC" : "")>
+                <td>@Html.ActionLink(asg.Id.ToString(), "Index", "Asg", new {id = asg.Id}, null)</td>
+                <td>@asg.Name</td>
+                <td>@Html.ActionLink(asg.Performer.Name, "Index", "Performer", new {id = asg.Performer.Id}, null)</td>
+                <td>@(asg.Deadline?.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture) ?? "-")</td>
+                <td>@asg.Status</td>
+                <td>@(asg.HasOverdue ? asg.Overdue.ToString() : "-")</td>
+            </tr>
         }
-    </div>
-    <div class="col-md-4" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto">
-        @(ViewBag.Chart)
-    </div>
-</div>
+        </tbody>
+    </table>
+    @for (var i = 1; i <= ViewBag.AllAsgListCount; ++i)
+    {
+        if (i == ViewBag.Page)
+        {
+            <span style="margin: 5px 0 5px 0">@i</span>
+        }
+        else
+        {
+            <span style="margin: 5px 0 5px 0"><a href="#" onclick="loadPage(@i)">@i</a> </span>
+        }
+    }
